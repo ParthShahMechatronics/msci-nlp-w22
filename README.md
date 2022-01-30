@@ -1,2 +1,2 @@
 # msci-nlp-w22
-Couse Assignments
+Course Assignments

@@ -1,13 +1,11 @@
 # Parth Shah NLP A1
 # 1. Tokenize the corpus 
-# 2. Remove the following special characters: !"#$%&()*+/:;<=>@[\\]^`{|}~\t\n 
+# 2. Remove the following special characters: !"#$%&()*+/:;<=>@[\\]^`{|}~\t\n
 # 3. Create two versions of your dataset: (1) with stopwords and (2) without stopwords. 
 # Stopword lists are available online. 
 # 4. Randomly split your data into training (80%), validation (10%) and test (10%) sets.
 
-from opcode import opname
 import random
-import csv
 import re
 import argparse
 
@@ -19,8 +17,8 @@ args = parser.parse_args()
 # stop words list obtained from https://gist.github.com/sebleier/554280?permalink_comment_id=3056587#gistcomment-3056587
 sw = ["i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", "yours", "yourself", "yourselves", "he", "him", "his", "himself", "she", "her", "hers", "herself", "it", "its", "itself", "they", "them", "their", "theirs", "themselves", "what", "which", "who", "whom", "this", "that", "these", "those", "am", "is", "are", "was", "were", "be", "been", "being", "have", "has", "had", "having", "do", "does", "did", "doing", "a", "an", "the", "and", "but", "if", "or", "because", "as", "until", "while", "of", "at", "by", "for", "with", "about", "against", "between", "into", "through", "during", "before", "after", "above", "below", "to", "from", "up", "down", "in", "out", "on", "off", "over", "under", "again", "further", "then", "once", "here", "there", "when", "where", "why", "how", "all", "any", "both", "each", "few", "more", "most", "other", "some", "such", "no", "nor", "not", "only", "own", "same", "so", "than", "too", "very", "s", "t", "can", "will", "just", "don", "should", "now"]
 
-final_sw = list()
-final_nsw = list()
+final_sw = list() # final tokenized sentences with stop words
+final_nsw = list() # final tokenized sentences with no stop words
 
 def parse_into_list(path, listname, val):
     file_read = open(path, "r")
@@ -35,7 +33,7 @@ def tokenize_corpus(corp):
 
     for line in corp:
         phrase = line[0]
-        phrase_tok = re.split("[\.*]|[\,*]|[\'*]|[ *]|[\!*]|[\"*]|[#]|[\$]|[%]|[&]|[\(]|[\)]|[\*]|[\+]|[/]|[:]|[;]|[<]|[=]|[>]|[@]|[\[]|\\|[\]]|[\^]|[`]|[\{]|[\|]|[\}]|[~]|[\t]|[\n]", phrase)
+        phrase_tok = re.split("[\.*]|[\,*]|[\'*]|[ *]|[\!*]|[\"*]|[#]|[\$]|[%]|[&]|[\(]|[\)]|[\*]|[\+]|[/]|[:]|[;]|[<]|[=]|[>]|[@]|[\[]|\\|[\]]|[\^]|[`]|[\{]|[\|]|[\}]|[~]|[-]|[\t]|[\n]", phrase) #|[-]
 
         tok_sw = list() # tokens with stop words
         tok_nsw = list() # tokens with no stop words
@@ -58,7 +56,7 @@ def tokenize_corpus(corp):
 # 6. train_ns.csv: training set w/o stopwords  
 # 7. val_ns.csv: validation set w/o stopwords  
 # 8. test_ns.csv: test set w/o stopwords
-# labels: out_l.csv, train_l.csv, val_l.csv, test_l.csv
+# 9. labels: out_l.csv, train_l.csv, val_l.csv, test_l.csv
 
 def output_csv(total_size):
 
@@ -68,7 +66,7 @@ def output_csv(total_size):
         open("out_l.csv", "a").write(str(final_sw[line][1])+"\n")
 
         # training sets (80%)
-        if line < (total_size * 0.8) :
+        if line < (total_size * 0.8):
             open("train.csv", "a").write(str(final_sw[line][0])+"\n")
             open("train_ns.csv", "a").write(str(final_nsw[line][0])+"\n")
             open("train_l.csv", "a").write(str(final_sw[line][1])+"\n")
@@ -84,6 +82,19 @@ def output_csv(total_size):
             open("test.csv", "a").write(str(final_sw[line][0])+"\n")
             open("test_ns.csv", "a").write(str(final_nsw[line][0])+"\n")
             open("test_l.csv", "a").write(str(final_sw[line][1])+"\n")
+
+    open("out.csv", "a").close()
+    open("out_ns.csv", "a").close()
+    open("out_l.csv", "a").close()
+    open("train.csv", "a").close()
+    open("train_ns.csv", "a").close()
+    open("train_l.csv", "a").close()
+    open("val.csv", "a").close()
+    open("val_ns.csv", "a").close()
+    open("val_l.csv", "a").close()
+    open("test.csv", "a").close()
+    open("test_ns.csv", "a").close()
+    open("test_l.csv", "a").close()
 
 
 if __name__ == '__main__':
@@ -105,39 +116,3 @@ if __name__ == '__main__':
     output_csv(len(combined))
 
     print("done")
-
-
-#appendix
-        # with open("out.csv", "a") as f:
-        #     csv.writer(f).writerow(final_sw[line][0])
-        # with open("out_ns.csv", "a", newline='') as f:
-        #     csv.writer(f).writerow(final_nsw[line][0])
-        # with open("out_l.csv", "a", newline='') as f:
-        #     csv.writer(f).writerow(str(final_sw[line][1]))
-
-        # # training sets (80%)
-        # if line < (total_size * 0.8) :
-        #     with open("train.csv", "a", newline='') as f:
-        #         csv.writer(f).writerow(final_sw[line][0])
-        #     with open("train_ns.csv", "a", newline='') as f:
-        #         csv.writer(f).writerow(final_nsw[line][0])
-        #     with open("train_l.csv", "a", newline='') as f:
-        #         csv.writer(f).writerow(str(final_sw[line][1]))
-
-        # # validation sets (10%)
-        # elif line < (total_size * 0.9):
-        #     with open("val.csv", "a", newline='') as f:
-        #         csv.writer(f).writerow(final_sw[line][0])
-        #     with open("val_ns.csv", "a", newline='') as f:
-        #         csv.writer(f).writerow(final_nsw[line][0])
-        #     with open("val_l.csv", "a", newline='') as f:
-        #         csv.writer(f).writerow(str(final_sw[line][1]))
-        
-        # # test sets (10%)
-        # else:
-        #     with open("test.csv", "a", newline='') as f:
-        #         csv.writer(f).writerow(final_sw[line][0])
-        #     with open("test_ns.csv", "a", newline='') as f:
-        #         csv.writer(f).writerow(final_nsw[line][0])
-        #     with open("test_l.csv", "a", newline='') as f:
-        #         csv.writer(f).writerow(str(final_sw[line][1]))

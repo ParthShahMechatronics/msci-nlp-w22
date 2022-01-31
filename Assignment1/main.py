@@ -5,14 +5,15 @@
 # Stopword lists are available online. 
 # 4. Randomly split your data into training (80%), validation (10%) and test (10%) sets.
 
+from opcode import opname
 import random
-import sys
+import csv
 import re
 import argparse
 
 parser = argparse.ArgumentParser(description='Enter location for pos.tx and neg.tx')
-parser.add_argument('--pos_in', type=str, help='Path to pos.txt:', default='pos.txt')
-parser.add_argument('--neg_in', type=str, help='Path to neg.txt:', default='neg.txt')
+parser.add_argument('pos_in', type=str, help='Path to pos.txt:', default='pos.txt')
+parser.add_argument('neg_in', type=str, help='Path to neg.txt:', default='neg.txt')
 args = parser.parse_args()
 
 # stop words list obtained from https://gist.github.com/sebleier/554280?permalink_comment_id=3056587#gistcomment-3056587
@@ -48,6 +49,42 @@ def tokenize_corpus(corp):
         final_sw.append([tok_sw, line[1]])
         final_nsw.append([tok_nsw, line[1]])
 
+# Expected output files:  
+# 1. out.csv: tokenized sentences w/ stopwords  
+# 2. train.csv: training set w/ stopwords  
+# 3. val.csv: validation set w/ stopwords  
+# 4. test.csv: test set w/ stopwords  
+# 5. out_ns.csv: tokenized sentences w/o stopwords  
+# 6. train_ns.csv: training set w/o stopwords  
+# 7. val_ns.csv: validation set w/o stopwords  
+# 8. test_ns.csv: test set w/o stopwords
+# labels: out_l.csv, train_l.csv, val_l.csv, test_l.csv
+
+def output_csv(total_size):
+
+    for line in range(total_size):
+        open("out.csv", "a").write(str(final_sw[line][0])+"\n")
+        open("out_ns.csv", "a").write(str(final_nsw[line][0])+"\n")
+        open("out_l.csv", "a").write(str(final_sw[line][1])+"\n")
+
+        # training sets (80%)
+        if line < (total_size * 0.8) :
+            open("train.csv", "a").write(str(final_sw[line][0])+"\n")
+            open("train_ns.csv", "a").write(str(final_nsw[line][0])+"\n")
+            open("train_l.csv", "a").write(str(final_sw[line][1])+"\n")
+
+        # validation sets (10%)
+        elif line < (total_size * 0.9):
+            open("val.csv", "a").write(str(final_sw[line][0])+"\n")
+            open("val_ns.csv", "a").write(str(final_nsw[line][0])+"\n")
+            open("val_l.csv", "a").write(str(final_sw[line][1])+"\n")
+        
+        # test sets (10%)
+        else:
+            open("test.csv", "a").write(str(final_sw[line][0])+"\n")
+            open("test_ns.csv", "a").write(str(final_nsw[line][0])+"\n")
+            open("test_l.csv", "a").write(str(final_sw[line][1])+"\n")
+
 
 if __name__ == '__main__':
     pos_path = args.pos_in
@@ -60,9 +97,47 @@ if __name__ == '__main__':
     parse_into_list(neg_path, neg_list, 0)
     combined = pos_list + neg_list
 
+    # create a mixed corpus dataset with positive and negative reviews
+    random.shuffle(combined)
+
     tokenize_corpus(combined)
 
-    # # testing
-    # index = 0
-    # print(final_sw[index])
-    # print(final_nsw[index])  
+    output_csv(len(combined))
+
+    print("done")
+
+
+#appendix
+        # with open("out.csv", "a") as f:
+        #     csv.writer(f).writerow(final_sw[line][0])
+        # with open("out_ns.csv", "a", newline='') as f:
+        #     csv.writer(f).writerow(final_nsw[line][0])
+        # with open("out_l.csv", "a", newline='') as f:
+        #     csv.writer(f).writerow(str(final_sw[line][1]))
+
+        # # training sets (80%)
+        # if line < (total_size * 0.8) :
+        #     with open("train.csv", "a", newline='') as f:
+        #         csv.writer(f).writerow(final_sw[line][0])
+        #     with open("train_ns.csv", "a", newline='') as f:
+        #         csv.writer(f).writerow(final_nsw[line][0])
+        #     with open("train_l.csv", "a", newline='') as f:
+        #         csv.writer(f).writerow(str(final_sw[line][1]))
+
+        # # validation sets (10%)
+        # elif line < (total_size * 0.9):
+        #     with open("val.csv", "a", newline='') as f:
+        #         csv.writer(f).writerow(final_sw[line][0])
+        #     with open("val_ns.csv", "a", newline='') as f:
+        #         csv.writer(f).writerow(final_nsw[line][0])
+        #     with open("val_l.csv", "a", newline='') as f:
+        #         csv.writer(f).writerow(str(final_sw[line][1]))
+        
+        # # test sets (10%)
+        # else:
+        #     with open("test.csv", "a", newline='') as f:
+        #         csv.writer(f).writerow(final_sw[line][0])
+        #     with open("test_ns.csv", "a", newline='') as f:
+        #         csv.writer(f).writerow(final_nsw[line][0])
+        #     with open("test_l.csv", "a", newline='') as f:
+        #         csv.writer(f).writerow(str(final_sw[line][1]))

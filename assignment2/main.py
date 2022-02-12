@@ -4,10 +4,12 @@ import os
 import re
 import argparse
 import pickle
+import numpy as np
 from pprint import pprint
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 
 parser = argparse.ArgumentParser(description='Enter folder location for splits')
@@ -36,18 +38,24 @@ def load_data(data_dir):
 
     return s_train, s_val, s_test, train_l, val_l, test_l, ns_train, ns_val, ns_test
 
-def train(x_train, y_train, tupl):
+def train(x_train, y_train, tupl, val_set, val_l):
     print('Calling CountVectorizer')
     # ngram_range=(x,y) # 1,1 is unigram 2,2 is bigram 1,2 is unigram+bigram
     count_vect = CountVectorizer(ngram_range=tupl)
     x_train_count = count_vect.fit_transform(x_train)
+    x_val_count = count_vect.fit_transform(val_set)
     print('Building Tf-idf vectors')
     tfidf_transformer = TfidfTransformer()
     x_train_tfidf = tfidf_transformer.fit_transform(x_train_count)
+    x_val_tfidf = tfidf_transformer.fit_transform(x_val_count)
     print('Training MNB for' + str(tupl))
     # TODO: need to find best alpha val 
     clf = MultinomialNB().fit(x_train_tfidf, y_train)
-    return clf, count_vect, tfidf_transformer
+    params = {'alpha':np.linspace(0.1, 5.0, num = 10)}
+    best_clf = GridSearchCV(clf, params).fit(x_val_tfidf, val_l)
+
+    return best_clf, count_vect, tfidf_transformer
+
 
 # x - train/test data, y - labels
 def evaluate(x, y, clf, count_vect, tfidf_transformer):
@@ -80,7 +88,7 @@ if __name__ == '__main__':
         if(x,y) == (1,2):
             name = 'uni_bi'
         # with stop words
-        clf, count_vect, tfidf_transformer = train(s_train, train_l, (x,y))
+        clf, count_vect, tfidf_transformer = train(s_train, train_l, (x,y), s_val, val_l)
 
         with open('assignment2/data/mnb_'+ name +'.pkl', 'wb') as f:
             pickle.dump(clf, f)
@@ -95,7 +103,7 @@ if __name__ == '__main__':
         scores['test_' + name] = evaluate(s_test, test_l, clf, count_vect, tfidf_transformer) 
 
         # without sw
-        clf_ns, count_vect_ns, tfidf_transformer_ns = train(ns_train, train_l, (x,y))
+        clf_ns, count_vect_ns, tfidf_transformer_ns = train(ns_train, train_l, (x,y), ns_val, val_l)
 
         with open('assignment2/data/mnb_'+ name +'_ns.pkl', 'wb') as f:
             pickle.dump(clf_ns, f)

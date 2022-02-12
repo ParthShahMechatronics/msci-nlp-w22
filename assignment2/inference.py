@@ -2,7 +2,6 @@
 
 import sys
 import pickle
-from pprint import pprint
 
 def predict(line, clf, count_vect, tfidf_transformer):
     """slightly different from the evalaute function in main.py"""

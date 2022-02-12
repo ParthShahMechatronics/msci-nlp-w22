@@ -13,7 +13,7 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 
 parser = argparse.ArgumentParser(description='Enter folder location for splits')
-parser.add_argument('--splits', type=str, help='Path to splits folder:', default='../assignment1/data/')
+parser.add_argument('splits', type=str, help='Path to splits folder:', default='../assignment1/data/')
 args = parser.parse_args()
 
 def read_csv(data_path):

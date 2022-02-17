@@ -6,7 +6,7 @@ from gensim.models import Word2Vec
 import argparse
 
 parser = argparse.ArgumentParser(description='Enter folder location for Amazon corpus')
-parser.add_argument('--corp', type=str, help='Path to corpus folder:', default='../assignment1/')
+parser.add_argument('corp', type=str, help='Path to corpus folder:', default='../assignment1/')
 args = parser.parse_args()
 
 def read_dataset(data_path):
@@ -17,7 +17,7 @@ def read_dataset(data_path):
         neg_lines = f.readlines()
     all_lines = pos_lines + neg_lines
 
-    return [re.sub(r"[\.*]|[\,*]|[\'*]|[ *]|[\!*]|[\"*]|[#]|[\$]|[%]|[&]|[\(]|[\)]|[\*]|[\+]|[/]|[:]|[;]|[<]|[=]|[>]|[@]|[\[]|\\|[\]]|[\^]|[`]|[\{]|[\|]|[\}]|[~]|[-]|[\t]|[\n]", ' ', line).strip().split() for line in all_lines]
+    return [re.sub(r"[\.*]|[\,*]|[\'*]|[ *]|[\!*]|[\?*]|[\"*]|[#]|[\$]|[%]|[&]|[\(]|[\)]|[\*]|[\+]|[/]|[:]|[;]|[<]|[=]|[>]|[@]|[\[]|\\|[\]]|[\^]|[`]|[\{]|[\|]|[\}]|[~]|[-]|[\t]|[\n]", ' ', line).strip().split() for line in all_lines]
 
 if __name__ == '__main__':
     corp_path = args.corp
@@ -26,4 +26,4 @@ if __name__ == '__main__':
     print('Training word2vec model')
     # This will take some to finish
     w2v = Word2Vec(all_lines, vector_size=100, window=5, min_count=1, workers=4)
-    w2v.save('assignment3/data/w2v.model')
+    w2v.save('data/w2v.model')

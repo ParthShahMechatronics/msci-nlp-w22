@@ -11,10 +11,10 @@ from tensorflow.keras.preprocessing.sequence import pad_sequences
 import argparse
 
 # These are some hyperparameter constants that can be tuned
-MAX_SENT_LEN = 25
+MAX_SENT_LEN = 20
 MAX_VOCAB_SIZE = 20000
 EMBEDDING_DIM = 100
-BATCH_SIZE = 32
+BATCH_SIZE = 64
 N_EPOCHS = 10
 
 parser = argparse.ArgumentParser(description='Enter folder location from A1')
@@ -62,17 +62,17 @@ def train_model(activation_name, embeddings_matrix, X_train, y_train, X_test, y_
                             mask_zero=True))
     model.add(Flatten())
     model.add(Dense(units = 128,  activation= activation_name, name='hidden_layer'))
-    model.add(Dropout(0.2))
+    model.add(Dropout(0.15))
     model.add(Dense(units=2, activation='softmax', name='output_layer'))
-    # model.add(Dropout(0.2))
+    model.add(Dropout(0.15))
     model.summary()    
     model.compile(loss='binary_crossentropy',
               optimizer='adam',
               metrics=['accuracy'])
-    
     model.fit(X_train, y_train, batch_size=BATCH_SIZE, epochs=N_EPOCHS, validation_data=(X_test, y_test))
+    # model.save('assignment4/data/' + activation_name + '.model')
+    
     return model
-        
 
 
 if __name__ == '__main__':
@@ -122,10 +122,10 @@ if __name__ == '__main__':
     eval_relu = model_relu.evaluate(s_test, test_l, batch_size=BATCH_SIZE)
     eval_tanh = model_tanh.evaluate(s_test, test_l, batch_size=BATCH_SIZE)
 
-    print("\n Sigmoid Evaluation (loss, accuracy): " + eval_sig)
-    print("\n ReLU Evaluation (loss, accuracy): " + eval_relu)
-    print("\n Tanh Evaluation (loss, accuracy): " + eval_tanh)
-    
+    print("\n Sigmoid Evaluation (loss, accuracy): ", eval_sig)
+    print("\n ReLU Evaluation (loss, accuracy): ", eval_relu)
+    print("\n Tanh Evaluation (loss, accuracy): ", eval_tanh)
+
     # debuggin
     # s_train = read_csv(os.path.join(splits_path, 'train.csv'), False)
     # print(s_train[6])

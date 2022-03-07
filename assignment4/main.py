@@ -18,7 +18,7 @@ BATCH_SIZE = 64
 N_EPOCHS = 10
 
 parser = argparse.ArgumentParser(description='Enter folder location from A1')
-parser.add_argument('--splits', type=str, help='Path to splits folder:', default='../assignment1/data/')
+parser.add_argument('splits', type=str, help='Path to splits folder:', default='../assignment1/data/')
 args = parser.parse_args()
 
 # read in csv files from A1

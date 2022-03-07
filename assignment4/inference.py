@@ -25,7 +25,7 @@ def seq_pad(data):
 
 # Classify based on model chosen
 def classify(filtered_sens, model_type):
-    model_dir = 'assignment4/data/nn_' + model_type + '.model'
+    model_dir = 'data/nn_' + model_type + '.model'
     # load model 
     model = keras.models.load_model(model_dir)
     filtered_sens = seq_pad(filtered_sens)
@@ -45,4 +45,3 @@ if __name__ == '__main__':
             print('positive')
         else:
             print('negative')
-    
